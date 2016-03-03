@@ -150,6 +150,9 @@ Segmentation of aphasic speech: \cite{fraser-EtAl:2015:NAACL-HLT}
 
 Guessing the next word: \cite{Shannon:1951p5641}
 
+Using phonemic similarity to identify potential lexical items: \cite{Han:Baldwin:11,Choudhury:2007:IMS:1326044.1326048}
+    - much related work in the text normalization literature \cite{Sproat:2001p5321}
+
 % subsection related_work (end)
 
 \section{Methods}
@@ -257,10 +260,16 @@ We ended up identifying two of the narrative tasks--- ``tell me about your strok
 In this study, we evaluated the performance implications of using either the omnibus model or a task-specific model.
 In future work (see section~\ref{sub:future_work}), we anticipate experimentation with interpolating between the two.
 
-
-
 \subsection{Lattice Construction \& Scoring} % (fold)
 \label{sub:lattice_construction_scoring}
+
+We next produced lattices representing the set of possible sentences that the subject could plausibly have been intending to produce. 
+We did this by constructing a finite-state acceptor whose arcs represent words in the sentence.
+At the point in the produced sentence where our error detection system indicated that a non-word production occurred, we represent the anomaly by the union of all possible words in our lexicon (see figure~\ref{fig:sample_lattice} for an example sentence lattice). 
+
+We next weighted the sentence lattice by composing it with our language model.
+Then, we pruned our lattice by computing the $n$-best paths through the resulting weighted automaton with the Log semiring (for this analysis, $n$ was XXX). % TODO: Joel, what was n? 10?
+Finally, we scored each possible remaining candidate production with the final forward probability of the version of the sentence containing that candidate.
 
 \begin{figure}[t]
 \centering
@@ -275,11 +284,27 @@ In future work (see section~\ref{sub:future_work}), we anticipate experimentatio
 \subsection{Phonological Similarity} % (fold)
 \label{sub:phonological_similarity}
 
-Phonetisaurus \cite{Novak:2011aa}
+At this point in the process, we have the following information about each erroneous production: a best-guess orthographic transcription of what the individual actually produced, and a ranked list of plausible lexical that they could potentially have been attempting to produce, together with probability estimates for each production.
+Our goal, recall, is to determine whether the erroneous production was a phonemic paraphasia or an abstruse neologism.
+In order to make this determination, we must know whether the subject's utterance is phonemically related to any of the plausible target words.
+
+Determining phonemic similarity can be done in a number of ways. 
+In this work, we compute several different metrics of phonological similarity, and then use the resulting scores as inputs to a classifier. 
+These methods fall into two general categories: rule-based and statistical.
+
+Many aphasia assessment instruments include strict rule-based guidelines on how to determine phonological similarity.
+The annotation standards used by the AphasiaBank project also include an algorithm for determining if two words are phonologically related or not.
+As an example of one such rule, under the guidelines used by the AphasiaBank project, monosyllabic productions with an onset, vowel nucleus, and coda must match two of the three elements of a target word in order to be considered phonologically similar.
+These rules are designed to optimize for coding consistency and ease of use on the part of linguistically informed human annotators.
+
+As described in section~\ref{sub:related_work}, besides rule-based phonological similarity metrics, there exist variety of statistical approaches for determining phonological similarity. 
+In this work, we employ an edit-distance based metric that uses phoneme category rules, and assigns smaller substitution costs to replacement of ``similar'' phonemes (i.e., a substituting one unvoiced fricative for another unvoiced fricative will cost less than substituting an unvoiced fricative for a voiced stop).
+
+We first convert our best-guess orthographic representation of the subject's non-lexical production to an estimated phonological representation using the Phonetisaurus grapheme-to-phoneme library \cite{Novak:2011aa}. Next, for each erroneous production, we compute the phonologically-aware edit distance, and also apply the AphasiaBank phonological similarity rules. 
 
 % subsection phonological_similarity (end)
 
-\subsection{Ranking \& Scoring} % (fold)
+\subsection{Classification, Re-ranking, \& Evaluation} % (fold)
 \label{sub:ranking_scoring}
 
 % subsection ranking_scoring (end)
@@ -302,6 +327,7 @@ Limitations:
 Future work:
     - better LM, better phonology, etc. etc.
         - interpolation between omnibus and task-specific LMs
+        - using backward probability as well as forward probability
     - using PoS/syntax to help word prediction
     - subject-level adaptation: using characteristics of the subject and their language to help identify erroneous productions
     - use of surprisal
@@ -309,9 +335,10 @@ Future work:
 
 % subsection future_work (end)
 
-% \section*{Acknowledgments}
-%
-% We gratefully acknowledge AphasiaBank
+\section*{Acknowledgments}
+
+Autism R01, Google, and Gerasimos's R03 
+
 
 \bibliography{target_word_prediction,other_refs}
 \bibliographystyle{naaclhlt2016}
