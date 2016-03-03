@@ -1,0 +1,225 @@
+%
+% File naaclhlt2016.tex
+%
+
+\documentclass[11pt,letterpaper]{article}
+\usepackage{fontspec}
+
+% http://tex.stackexchange.com/questions/193412/what-is-happening-to-the-quotes
+\setmainfont[Ligatures=TeX]{Times New Roman} 
+% note that I'm only screwing around with \setmainfont because I couldn't get the IPA characters to look right using \usepackage{times}.
+
+\usepackage{authblk}
+
+\usepackage{naaclhlt2016}
+% \usepackage{times}
+\usepackage{latexsym}
+
+% \naaclfinalcopy % Uncomment this line for the final submission
+\def\naaclpaperid{***} %  Enter the naacl Paper ID here
+
+% To expand the titlebox for more authors, uncomment
+% below and set accordingly.
+% \addtolength\titlebox{.5in}    
+
+\newcommand\BibTeX{B{\sc ib}\TeX}
+
+\title{Target word prediction and paraphasia classification in spoken discourse}
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a seperate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+% If the title and author information does not fit in the area allocated,
+% place \setlength\titlebox{<new height>} right after
+% at the top, where <new height> can be something larger than 2.25in
+% \author{Joel Adams \\ \textbf{Steven Bedrick} \\ \textbf{Jan Van Santen} \\
+%         Center for Spoken Language Understanding \\
+%         Oregon Health \& Science University \\
+%         3181 SW Sam Jackson Pk Rd \\
+%         Portland, OR USA 97239 \\
+%         {\tt \{adamjo,bedricks,vansanten\}@ohsu.edu}
+%       \And
+%     Gerasimos Fergadiotis\\
+%         Speech \& Hearing Sciences Department\\
+%           Portland State University\\
+%           PO Box 751\\
+%           Portland, OR, USA 97207\\
+%       {\tt gf3@pdx.edu}
+%   \And
+%   Kyle Gorman\\
+%   Google, Inc.\\
+%   79 9th Avenue \\
+%   New York, NY 10011 \\
+%   {\tt kbg@google.com}}
+
+\author[1]{\textbf{Joel Adams}}
+\author[1]{\textbf{Steven Bedrick}}
+\author[2]{\textbf{Gerasimos Fergadiotis}}
+\author[3]{\textbf{Kyle Gorman}}
+\author[1]{\textbf{Jan Van Santen}}
+\affil[1]{Center for Spoken Language Understanding, Oregon Health \& Science University, Portland, OR}
+\affil[2]{Speech \& Hearing Sciences Department, Portland State University, Portland, OR}
+\affil[3]{Google, Inc., New York, NY}
+\renewcommand\Authands{ and }
+
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+We present a system for automatically detecting and classifying phonologically anomalous productions in the speech of individuals with aphasia. 
+Working from transcribed discourse samles, our system identifies neologisms, and uses a combination of string alignment and language models to produce a lattice of plausible words that the speaker may have intended to produce. 
+We then score this lattice according to various features, and attempt to determine whether the anomalous production represented a phonemic error or a genuine neologism. 
+This approach has the potential to be expanded to consider other types of paraphasic errors, and could be applied to a wide variety of screening and therapeutic applications.
+
+\end{abstract}
+
+\section{Introduction}
+
+Aphasia is a neuropsychological condition in which an individual's ability to produce or comprehend language is compromised. 
+It can be caused by a number of different underlying pathologies, but can generally be traced back to physical damage to the individual's brain: tissue damage following a stroke or other ischemic event, lesions caused by a traumatic brain injury or infection, etc. 
+It can also be associated with various neurodegenerative diseases, as in the case of Primary Progressive Aphasia. 
+According to the National Institute of Neurological Disorders and Stroke, approximately 1,000,000 people in the United States suffer from aphasia \cite{National-Institute-of-Neurological-Disorders-and-Stroke:2014la}, and aphasia is a common consequence of strokes (prevalence estimates for aphasia among stroke patients vary, but are typically in the neighborhood of 30\% \cite{Engelter:2006da}).
+
+\emph{Anomia} is a the inability to access and retrieve words during language production, and is a common manifestation of aphasia [cite].
+An anomic individual will experience difficulty recalling words and naming items, which can cause substantial difficulties in day-to-day communication. 
+Additionally, long-term communication difficulties associated with aphasia in general have been shown to affect the psychological well-being of people with aphasia as well as their families \cite{doi:10.1080/02687030244000707,Gaete:2008jr,vanDijk:2015gz}.
+
+The process of screening for, diagnosing, and assessing anomia is typically manual in nature, and requires substantial time, labor, and expertise. 
+Compared to other neuropsychological assessment instruments, aphasia-related assessments are particularly difficult to computerize, as they typically depend on subtle and complex linguistic judgments about the phonological and semantic similarity of words, and also require the examiner to interpret phonologically disordered speech.
+Furthermore, the most commonly used assessments focus for practical reasons on relatively constrained tasks such as picture naming, which may lack ecological validity \cite{Mayer:2003kp}.
+
+In this work, we describe an approach to automatically detecting and analyzing certain categories of word production errors characteristic of anomia in connected speech.
+Our approach is a first step towards an automated anomia assessment tool that could be used cost effectively in both clinical and research settings, and could also be applied to other disorders of speech production.
+The method we propose uses statistical language models to identify possible errors, and employs a phonologically-informed edit distance model to determine phonological similarity between the subject's utterance and a set of plausible ``intended words.''
+We then apply machine learning techniques to determine which of several categories a given erroneous production may fall into. 
+We show XXXX % TODO: what do we show?
+
+We also examine the effects of 
+
+\subsection{Anomia and Paraphasias} % (fold)
+\label{sub:anomia_and_paraphasias}
+
+% subsection anomia_and_paraphasias (end)
+
+Anomia can take several different forms, but in this work we are concerned with \emph{paraphasias}, which are unintended errors in word production.\footnote{Note that individuals \emph{without} any sort of language disorder do occasionally produce paraphasias in their speech.} 
+There are several categories of paraphasic error. \emph{Semantic errors} arise when an individual unintentionally produces a semantically-related word to their original, intended word (their ``target word'').
+A classic semantic error would be saying ``cat'' when one intended to say ``dog.''
+
+\emph{Phonemic} (sometimes called ``formal'') errors occur when the speaker produces an unrelated word that is \emph{phonemically related} to their target: ``mat'' for ``cat'', for example. 
+It is also possible for an erroneous production to be \emph{mixed}, that is both semantically and phonemically related to the target word: ``rat'' for ``cat.''
+Individuals with anomia also produce \emph{perseverations}, which are words that are neither semantically or phonemically related to their intended target word: for example, producing ``skis'' instead of ``zipper.''
+
+Each of these categories shares the commonality that the word produced by the individual is a ``real'' word. There is another family of anomic errors, \emph{neologisms}, in which the individual produces \emph{non-word} productions. 
+A neologistic production may be phonemically related to the target, but containing phonological errors: ``[dɑɪnoʊsɔɹ]'' for ``dinosaur.'' 
+Alternatively, the individual may produce \emph{abstruse neologisms}, in which the produced phonemes bear no discernable similarity to any ``real'' lexical item (``[æpməl]'' for ``comb''\footnote{This example was taken from a corpus of responses to a confrontation naming test, in which the subject is shown a picture and required to name its contents. As such, in the case of this specific error, we have \emph{a priori} knowledge of what the target word ``should'' have been. Obviously, in a more naturalistic task or setting, we would not have this advantage.}).
+
+The standard theoretical model explaining these sorts of anomic errors is Dell's two-step word production model \cite{Dell:1997wj,Dell:1986vk}. 
+In this model, language being produced starts via
+
+
+\subsection{Related work} % (fold)
+\label{sub:related_work}
+
+Computational analysis of aphasic speech: \cite{MacWhinney:2011er} \cite{Goodglass:1994dp} \cite{Fraser:2014bg} \cite{fraser-EtAl:2014:W14-34}
+
+Syntactic analysis: \cite{Goodglass:1994dp}
+
+% subsection related_work (end)
+
+\section{Methods}
+
+\subsection{Dataset} % (fold)
+\label{sub:dataset}
+
+We used the AphasiaBank data set \cite{MacWhinney:2011er}
+
+Normalizations applied:
+    - Spelling and punctuation in task names harmonized
+    - Certain word-level error codes collapsed. For example, the AphasiaBank protocol includes a special annotation used to indicate that a given neologism error represents an utterance that recurs frequently within a particular subject, as occasionally happens with individuals with aphasia (e.g., an individual might repeatedly utter the phonemes XXX). Since the present analysis was not concerned with this aspect of the transcripts, we collapsed instances of this and several other similarly specific error codes into their more general forms.
+    - certain non-standard productions that are nevertheless typical of a dialect (``gotta'', etc.) are occasionally flagged by the AphasiaBank transcribers along with their ``canonical'' form (e.g. ``got to'' for ``gotta''). In these cases, we have replaced the ``true'' production with its canonical form. This is motivated by the fact that our language models are not explicitly trained on conversational speech.
+
+Tasks we're using are: "tell me about your stroke", and "important event"
+
+% subsection dataset (end)
+
+\subsection{Language Model Construction} % (fold)
+\label{sub:language_model_construction}
+
+Topic modeling: Not using MALLET itself- we're using gensim, num topics is 20\cite{McCallumMALLET}
+
+project aphasiabank stories into NYT topic-space, extract articles closest to the centroid for each task (via similarity threshold) (approx 10 percent of NYT ending up in each one)
+
+NYT Gigaword
+    - normalizations: no stop word removal, normalizing numbers to a category token- one for numbers, another for ordinals, replacing dates with a category token for dates, case-folding to upper case
+    - LDA on gigaword
+    - word language models are 4-gram
+
+language models:
+    1. Task-level AphasiaBank transcript models (i.e., a model just on NYT articles that are close to "tell me about stroke" in LDA topic space)
+    2. General all-NYT language model
+    3. Future work: experiment with interpolation?
+    
+Joel will give me example words from the two tasks's centroids, and also some info about a) exactly how many NYT articles we used for both, and b) some of the most representative article titles
+
+
+
+
+
+
+Language modeling: \cite{RoarkOpenGRM}
+
+% subsection language_model_construction (end)
+
+\subsection{Phonological Similarity} % (fold)
+\label{sub:phonological_similarity}
+
+% subsection phonological_similarity (end)
+
+\subsection{Ranking \& Scoring} % (fold)
+\label{sub:ranking_scoring}
+
+% subsection ranking_scoring (end)
+
+\section{Results}
+
+\section{Discussion}
+
+\section{Conclusion \& Future Work}
+
+Limitations:
+    - We are only using sentences with 1 error- excluding sentences with >1 error (N = 1,866)
+    - more generally, we don't have a clean idea of how/whether sentences with multiple errors are different from mono-error sentences
+        - open question for future work: are paraphasic errors within a sentence related to one another in some way?
+        - our general finite-state approach can be generalized to sentences with additional errors, and we will explore such possibilities in future work!
+
+Future work:
+    - better LM, better phonology, etc. etc.
+    - using PoS/syntax to help word prediction
+    - subject-level adaptation: using characteristics of the subject and their language to help predict
+
+% \section*{Acknowledgments}
+%
+% We gratefully acknowledge AphasiaBank
+
+\bibliography{target_word_prediction,other_refs}
+\bibliographystyle{naaclhlt2016}
+
+
+\end{document}
