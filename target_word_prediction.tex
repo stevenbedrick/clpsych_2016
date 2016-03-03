@@ -299,7 +299,8 @@ These rules are designed to optimize for coding consistency and ease of use on t
 As described in section~\ref{sub:related_work}, besides rule-based phonological similarity metrics, there exist variety of statistical approaches for determining phonological similarity. 
 In this work, we employ an edit-distance based metric that uses phoneme category rules, and assigns smaller substitution costs to replacement of ``similar'' phonemes (i.e., a substituting one unvoiced fricative for another unvoiced fricative will cost less than substituting an unvoiced fricative for a voiced stop).
 
-We first convert our best-guess orthographic representation of the subject's non-lexical production to an estimated phonological representation using the Phonetisaurus grapheme-to-phoneme library \cite{Novak:2011aa}. Next, for each erroneous production, we compute the phonologically-aware edit distance, and also apply the AphasiaBank phonological similarity rules. 
+We first convert our best-guess orthographic representation of the subject's non-lexical production to an estimated phonological representation using the Phonetisaurus grapheme-to-phoneme library \cite{Novak:2011aa}. 
+Next, we compute the phonologically-aware edit distance for each (production,candidate target) pair, and also apply the AphasiaBank phonological similarity rules. We use the CMU Pronouncing dictionary to obtain phonetic representations of the candidate target words.
 
 % subsection phonological_similarity (end)
 
