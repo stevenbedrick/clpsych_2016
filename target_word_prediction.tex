@@ -72,18 +72,19 @@ This approach has the potential to be expanded to consider other types of paraph
 Aphasia is a neuropsychological condition in which an individual's ability to produce or comprehend language is compromised.
 It can be caused by a number of different underlying pathologies, but can generally be traced back to physical damage to the individual's brain: tissue damage following ischemic or hemorrhagic stroke, lesions caused by a traumatic brain injury or infection, etc.
 It can also be associated with various neurodegenerative diseases, as in the case of Primary Progressive Aphasia.
-According to the National Institute of Neurological Disorders and Stroke, approximately 1,000,000 people in the United States suffer from aphasia \cite{National-Institute-of-Neurological-Disorders-and-Stroke:2014la}, and aphasia is a common consequence of strokes (prevalence estimates for aphasia among stroke patients vary, but are typically in the neighborhood of 30\% \cite{Engelter:2006da}).
+According to the National Institute of Neurological Disorders and Stroke, approximately 1,000,000 people in the United States suffer from aphasia.
+Aphasia is a common consequence of stroke: prevalence estimates for aphasia among stroke patients vary, but are typically in the neighborhood of 30\% \cite{Engelter:2006}.
 
-\emph{Anomia} is a the inability to access and retrieve words during language production, and is a common manifestation of aphasia \cite{Goodglass:1997ys}.
+\emph{Anomia} is a the inability to access and retrieve words during language production, and is a common manifestation of aphasia \cite{Goodglass:1997}.
 An anomic individual will experience difficulty producing words and naming items, which can cause substantial difficulties in day-to-day communication.
-Additionally, long-term communication difficulties associated with aphasia in general have been shown to affect the psychological well-being of people with aphasia as well as their families \cite{doi:10.1080/02687030244000707,Gaete:2008jr,vanDijk:2015gz}.
+Additionally, long-term communication difficulties associated with aphasia in general have been shown to affect the psychological well-being of people with aphasia as well as their families \cite{Kristensson:2015,Gaete:2008,vanDijk:2015}.
 
 The process of screening for, diagnosing, and assessing anomia is typically manual in nature, and requires substantial time, labor, and expertise.
 Compared to other neuropsychological assessment instruments, aphasia-related assessments are particularly difficult to computerize, as they typically depend on subtle and complex linguistic judgments about the phonological and semantic similarity of words, and also require the examiner to interpret phonologically disordered speech.
-Furthermore, the most commonly used assessments focus for practical reasons on relatively constrained tasks such as picture naming, which may lack ecological validity \cite{Mayer:2003kp}.
+Furthermore, the most commonly used assessments focus for practical reasons on relatively constrained tasks such as picture naming, which may lack ecological validity \cite{Mayer:2003}.
 
 In this work, we describe an approach to automatically detecting and analyzing certain categories of word production errors characteristic of anomia in connected speech.
-Our approach is a first step towards an automated anomia assessment tool that could be used cost effectively in both clinical and research settings,\footnote{As in the computer-administered (but manually-scored) assessments developed by Fergadiotis and colleagues \cite{Fergadiotis:2015gp,Hula:2015kz}. } and could also be applied to other disorders of speech production.
+Our approach is a first step towards an automated anomia assessment tool that could be used cost effectively in both clinical and research settings,\footnote{As in the computer-administered (but manually-scored) assessments developed by Fergadiotis and colleagues \cite{Fergadiotis:2015,Hula:2015}.} and could also be applied to other disorders of speech production.
 The method we propose uses statistical language models to identify possible errors, and employs a phonologically-informed edit distance model to determine phonological similarity between the subject's utterance and a set of plausible ``intended words.''
 We then apply machine learning techniques to determine which of several categories a given erroneous production may fall into.
 We show XXXX % TODO: what do we show?
@@ -95,7 +96,18 @@ We show XXXX % TODO: what do we show?
 
 Anomia can take several different forms, but in this work we are concerned with \emph{paraphasias},
 which are unintended errors in word production.\footnote{Note that individuals \emph{without} any sort of language disorder do occasionally produce errors in their speech; this fact has led to a truly shocking amount of study by linguists.
-Frisch \& Wright \shortcite{Frisch:wh} provide a reasonable overview of the background and phonology of the phenomenon.} % TODO: Kyle, Gerasimos, do either you have a better refrence for this?
+Frisch \& Wright \shortcite{Frisch:2002} provide a reasonable overview of the background and phonology of the phenomenon.} % TODO: Kyle, Gerasimos, do either you have a better refrence for this?
+% I'd say Shattuck-Hufnagel's work on this is where I'd start.
+%
+%@article{Shattuck-Hufnagel1986,
+%  Author = {Stefanie Shattuck-Hufnagel},
+%  Journal = {Phonology Yearbook},
+%  Pages = {117-149},
+%  Title = {The representation of phonological information during speech production planning: Evidence from vowel errors in spontaneous speech},
+%  Volume = {3},
+%  Year = {1986}}
+% But I think I'd just cut this digression altogether. --KG.
+
 There are several categories of paraphasic error. \emph{Semantic errors} arise when an individual unintentionally produces a semantically-related word to their original, intended word (their ``target word'').
 A classic semantic error would be saying ``cat'' when one intended to say ``dog.''
 
@@ -106,10 +118,10 @@ Individuals with anomia also produce \emph{unrelated} errors, which are words th
 Each of these categories shares the commonality that the word produced by the individual is a ``real'' word. There is another family of anomic errors, \emph{neologisms}, in which the individual produces \emph{non-word} productions.
 A neologistic production may be phonemically related to the target, but containing phonological errors: ``[dɑɪnoʊsɔɹ]'' for ``dinosaur.''
 These are often referred t as \emph{phonological} paraphasias.
-Alternatively, the individual may produce \emph{abstruse neologisms}, in which the produced phonemes bear no discernable similarity to any ``real'' lexical item (``[æpməl]'' for ``comb''\footnote{This example was taken from a corpus of responses to a confrontation naming test \cite{Mirman:2010cd}, in which the subject is shown a picture and required to name its contents. As such, in the case of this specific error, we have \emph{a priori} knowledge of what the target word ``should'' have been. Obviously, in a more naturalistic task or setting, we would not have this advantage.}).
+Alternatively, the individual may produce \emph{abstruse neologisms}, in which the produced phonemes bear no discernable similarity to any ``real'' lexical item (``[æpməl]'' for ``comb''\footnote{This example was taken from a corpus of responses to a confrontation naming test \cite{Mirman:2010}, in which the subject is shown a picture and required to name its contents. As such, in the case of this specific error, we have \emph{a priori} knowledge of what the target word ``should'' have been. Obviously, in a more naturalistic task or setting, we would not have this advantage.}).
 
 A full discussion of the theoretical basis for this typology of paraphasias is beyond the scope of this paper.
-That said, it is worth nothing that the standard model explaining these sorts of anomic errors is Dell's two-step word production model \cite{Dell:1997wj,Dell:1986vk}.
+That said, it is worth nothing that the standard model explaining these sorts of anomic errors is Dell's two-step word production model \cite{Dell:1986,Dell:1997}.
 In Dell's model, language production occurs in two primary phases.
 First, the speaker forms some semantic representation of what they wish to say, and accesses the lemma form of that word.
 Then, those selected lexical items are translated into spoken language.
@@ -119,20 +131,20 @@ When problems occur in both steps of the process, we see a mixed error (i.e., an
 
 The present work focuses exclusively on neologisms, both of the phonological variety as well as the abstruse variety. However, our fundamental approach can be extended to include other forms, as described in section~\ref{sub:future_work}.
 
-Typical methods of diagnosing, staging, and otherwise characterizing anomia involve determining the number and kinds of paraphasias produced by an individual while undergoing some structured language elicitation process, for example a confrontation naming test (see \cite{Kendall:2013hm} and \cite{Brookshire:2014fa} for examples of such a study).
+Typical methods of diagnosing, staging, and otherwise characterizing anomia involve determining the number and kinds of paraphasias produced by an individual while undergoing some structured language elicitation process, for example a confrontation naming test (see \cite{Kendall:2013} and \cite{Brookshire:2014} for examples of such a study).
 As alluded to previously, producing these counts and classifications is a complex and laborious process.
 Furthermore, it is also often an inherently subjective process: are ``carrot'' and ``banana'' semantically related?
 What about ``hose'' and ``rope''?
 
-Reliability estimates of expert human performance at paraphasia classification in confrontation naming scenarios reflect the difficulty in this task. One recent study reported a kappa-equivalent score of 0.76 --- a score that that is certainly acceptable, but that leaves much room for disagreement on the status of specific erroneous productions \cite{Minkina:2015dz}.
-Other reported scores fall in a similar range \cite{doi:10.1080/02687038.2014.973359}, including when the productions are from neurotypical individuals \cite{doi:10.1080/02687038908249023}.
+Reliability estimates of expert human performance at paraphasia classification in confrontation naming scenarios reflect the difficulty in this task. One recent study reported a kappa-equivalent score of 0.76 --- a score that that is certainly acceptable, but that leaves much room for disagreement on the status of specific erroneous productions \cite{Minkina:2015}.
+Other reported scores fall in a similar range \cite{Kristensson:2015}, including when the productions are from neurotypical individuals \cite{Nicholas:1989}.
 Automating this aspect of the task would not only improve efficiency, but would also decrease scoring variability.
 
 Having a reliable, automated method to analyze paraphasic errors would also expand the scope of what is currently possible in terms of assessment methodologies.
 Confrontation naming tests are often used (both in the clinic as well as in research settings) not because they are thought to optimally characterize the speech capabilities of their subjects, but rather out of concerns regarding feasibility of scoring.
-Naturalistic language samples may be more ecologically valid, but such data present a very complex and challenging scoring scenario (for example, see \cite{Nicholas:1993wl,Berndt:2000aa,Rochon:2000js}), and so practitioners often eschew them in favor of simpler, more structured assessments.
+Naturalistic language samples may be more ecologically valid, but such data present a very complex and challenging scoring scenario (for example, see \cite{Nicholas:1993,Berndt:2000,Rochon:2000}), and so practitioners often eschew them in favor of simpler, more structured assessments.
 
-Notably, the approach we outline in this paper is explicitly designed to work on samples of natural, connected speech--- though it did grow out of work that the authors are currently doing on automated confrontation naming test scoring.
+Notably, the approach we outline in this paper is explicitly designed to work on samples of natural, connected speech---though it did grow out of work that the authors are currently doing on automated confrontation naming test scoring.
 It is our hope that, by enabling automated calculation of  error frequencies and types on narrative speech, we might make using such material far easier in practice than it is today.
 
 \subsection{Related work} % (fold)
@@ -141,16 +153,16 @@ It is our hope that, by enabling automated calculation of  error frequencies and
 The general problem of applying NLP to language assessment has seen a phenomenal amount of work in recent years.
 
 Computational analysis of aphasic speech:
-    Using aphasiabank \cite{MacWhinney:2011er}
-    automatic sub-typing from narrative transcripts\cite{Fraser:2014bg}
-    statistical parsing to detect\cite{fraser-EtAl:2014:W14-34}
-        Syntactic analysis of same: \cite{Goodglass:1994dp}
-Segmentation of aphasic speech: \cite{fraser-EtAl:2015:NAACL-HLT}
+    Using aphasiabank \cite{MacWhinney:2011}
+    automatic sub-typing from narrative transcripts\cite{Fraser:2014a}
+    statistical parsing to detect\cite{Fraser:2014a}
+        Syntactic analysis of same: \cite{Goodglass:1994}
+Segmentation of aphasic speech: \cite{Fraser:2015}
 
-Guessing the next word: \cite{Shannon:1951p5641}
+Guessing the next word: \cite{Shannon:1951}
 
-Using phonemic similarity to identify potential lexical items: \cite{Han:Baldwin:11,Choudhury:2007:IMS:1326044.1326048}
-    - much related work in the text normalization literature \cite{Sproat:2001p5321}
+Using phonemic similarity to identify potential lexical items: \cite{Han:2011,Choudhury:2007}
+    - much related work in text normalization \cite{Sproat:2001}
 
 % subsection related_work (end)
 
@@ -167,7 +179,7 @@ We will describe each step of the process in detail below, beginning with our th
 \subsection{Dataset} % (fold)
 \label{sub:dataset}
 
-For the work described in this paper, we relied on the AphasiaBank project \cite{MacWhinney:2011er}, which has assembled a large database of transcribed interactions between examiners and people with aphasia, nearly all of whom have suffered a stroke.
+For the work described in this paper, we relied on the AphasiaBank project \cite{MacWhinney:2011}, which has assembled a large database of transcribed interactions between examiners and people with aphasia, nearly all of whom have suffered a stroke.
 Notably, AphasiaBank also includes some number of transcribed sessions with neurotypical controls.
 Each interaction follows a common protocol and script, and is transcribed in great detail using a standardized set of annotation guidelines.
 The transcripts include word-level error codes, according to a spectacularly detailed taxonomy of errors and associated annotations.
@@ -175,7 +187,8 @@ Erroneous productions are not simply flagged as erroneous.
 In the case of semantic, formal, and phonemic errors, the word-level annotations include a ``best guess'' on the part of the transcriber as to what the speaker's intended production may have been.
 In the case of non-lexical productions (phonemic errors, neologisms, etc.), the annotations include an IPA transcription of the subject's precise utterance.
 In some cases, the transcribers include information about gestures and other non-verbal communication that the subjects may have produced.
-The transcripts are stored in the CLAN (Computerized Language Analysis) format \cite{MacWhinney:2000aa}, and are therefore highly amenable to automated analysis.
+The transcripts are stored in the CLAN (Computerized Language Analysis) format \cite{MacWhinney:2000}, and are therefore highly amenable to automated analysis.
+% TODO(Joel): I was surprised to see you say that CLAN was "highly amenable", as it alwas seemed to me like a total mess without much of a clear schema. I know CHILDES is available as schematic XML...is that also true for AphasiaBank? If so, I'd say it's worth a small amount of time to chuck the CLAN annotations (and whatever you're using to deal with them) and replace them with a bit of XML handling. --KBG.
 
 Each transcribed session consists of a prescribed sequence of language elicitation activities, including a set of personal narratives (e.g., ``Tell me a story about an important event that happened to you'', ``Do you remember when you had your stroke? Please tell me about it.''), standardized picture description tasks, a story retelling task (involving the story of \emph{Cinderella}), and a procedural discourse task (in which the subjects are asked to describe for the examiner the process of making a peanut-butter and jelly sandwich).
 
@@ -191,7 +204,7 @@ Certain non-standard productions that are nevertheless typical of a dialect (``g
 
 Finally, we transformed the human-generated IPA representation of non-word productions into a relatively impoverished graphemic representation.
 Our purpose in doing this was to simulate a scenario where we did \emph{not} have high-quality human-produced phonetic transcriptions. Obviously, one major obstacle to using narrative samples in any sort of clinical assessment is the need for transcription.
-Two of the most plausible solutions to this problem are automatic speech recognition (ASR)\footnote{See Fraser et al. \shortcite{fraser-EtAl:2015:NAACL-HLT} for a detailed discussion of the implications of using ASR on the speech of individuals with aphasia} and/or the use of \emph{non-expert} transcribers to produce ``quick-and-dirty'' transcripts (perhaps via Amazon Mechanical Turk, or some other such crowd-sourced platform).
+Two of the most plausible solutions to this problem are automatic speech recognition (ASR)\footnote{See Fraser et al.~\shortcite{Fraser:2015} for a detailed discussion of the implications of using ASR on the speech of individuals with aphasia} and/or the use of \emph{non-expert} transcribers to produce ``quick-and-dirty'' transcripts (perhaps via Amazon Mechanical Turk, or some other such crowd-sourced platform).
 
 In the case of ASR-derived transcripts, we would presumably have some sort of phonemic representation of what was said, though this representation would almost certainly be incomplete and error-prone (modern ASR systems are notorious for struggling with neologisms).
 In the case of non-expert transcribers, we would of course not have the professional-quality IPA transcriptions found in the AphasiaBank database.
@@ -218,7 +231,7 @@ Our final data set consisted of XXX sentences from YYY individuals, containing e
 
 We next turned to the question of identifying neologisms in our sentences.
 Simply using a standard dictionary to determine lexicality could result in numerous ``false positives,'' driven largely by proper names of people, brands, etc.
-To avoid this, we used the SUBTLEX-US corpus \cite{Brysbaert:2009du} to identify neologisms. SUBTLEX-US was build using subtitles from English-language television shows and movies, and Brysbaert and New have demonstrated that it correlates with a number of psycholinguistic behavior measures (most notably, naming latencies) better than better-known frequency norms such as those derived from the Brown corpus or CELEX-2.
+To avoid this, we used the SUBTLEX-US corpus \cite{Brysbaert:2009} to identify neologisms. SUBTLEX-US was build using subtitles from English-language television shows and movies, and Brysbaert and New have demonstrated that it correlates with a number of psycholinguistic behavior measures (most notably, naming latencies) better than better-known frequency norms such as those derived from the Brown corpus or CELEX-2.
 
 Note that, in the present analysis, this step in our pipeline was something of a contrived exercise, as (thanks to the detailed annotations present in the AphasiaBank transcripts) we already ``knew'' which tokens represented neologisms.
 However, in a ``real-world'' scenario, when we did \emph{not} know \emph{a priori} which tokens represented non-word productions, this step would be of particular importance, and we wished to simulate it with as much fidelity as possible.
@@ -234,16 +247,16 @@ To help accomplish this, we use a language model to identify plausible words tha
 \subsection{Language Model Construction} % (fold)
 \label{sub:language_model_construction}
 
-Our language models for this study were built using the New York Times section of the Gigaword newswire corpus. % TODO: Kyle add good citation.
+Our language models for this study were built using the New York Times section of the Gigaword newswire corpus \cite{Gigaword},
 We tokenized using the standard Penn Treebank tokenizer, left stopwords intact, and case-folded all sentences to upper-case.
 Cardinal numbers were collapsed into a category token, as were ordinal numbers and dates (each category was given its own token).
-We used the the OpenGrm-NGram language modeling toolkit \cite{RoarkOpenGRM} to build the language models themselves, using an n-gram order of 4, with XXX smoothing. % TODO: Joel, what kind of smoothing did we use?
+We used the the OpenGrm-NGram language modeling toolkit \cite{Roark:2012} to build the language models themselves, using an n-gram order of 4, with XXX smoothing. % TODO: Joel, what kind of smoothing did we use?
 
 We investigated two different language model approaches.
 In the first approach, we trained our models on the totality of the New York Times data.
 However, given that many of the AphasiaBank narrative tasks consist of fairly topic-constrained language (e.g., the Cinderella retelling, the personal narrative about the subject's stroke, etc.), we hypothesized that we would get better results (i.e., higher-quality word predictions) if we could train our models on a more focused set of data.
 
-To accomplish this, we used the Gensim topic modeling package \cite{rehurek_lrec} to train a Latent Dirichlet Allocation topic model \cite{Blei:2003:LDA:944919.944937} on the entire New York Times data set.
+To accomplish this, we used the Gensim topic modeling package \cite{Rehurek:2010} to train a Latent Dirichlet Allocation topic model \cite{Blei:2003} on the entire New York Times data set.
 For the present analysis, we instructed the model to use 20 topics.
 We next projected the text of each of the narrative samples into the topic space described by the model, and calculated the centroids for each of the narrative task.
 This gave us, for example, the estimated topic distribution most representative of the Cinderella retellings, the PB\&J instructions, and so on.
@@ -292,13 +305,13 @@ These methods fall into two general categories: rule-based and statistical.
 
 Many aphasia assessment instruments include strict rule-based guidelines on how to determine phonological similarity.
 The annotation standards used by the AphasiaBank project also include an algorithm for determining if two words are phonologically related or not.
-As an example of one such rule, under the guidelines used by the AphasiaBank project, monosyllabic productions with an onset, vowel nucleus, and coda must match two of the three elements of a target word in order to be considered phonologically similar \cite{MacWhinney:2000aa}.
+As an example of one such rule, under the guidelines used by the AphasiaBank project, monosyllabic productions with an onset, vowel nucleus, and coda must match two of the three elements of a target word in order to be considered phonologically similar \cite{MacWhinney:2000}.
 These rules are designed to optimize for coding consistency and ease of use on the part of linguistically informed human annotators.
 
-As described in section~\ref{sub:related_work}, besides rule-based phonological similarity metrics, there exist variety of statistical approaches for determining phonological similarity. 
+As described in section~\ref{sub:related_work}, besides rule-based phonological similarity metrics, there exist variety of statistical approaches for determining phonological similarity.
 In this work, we employ an edit-distance based metric that uses phoneme category rules, and assigns smaller substitution costs to replacement of ``similar'' phonemes (i.e., a substituting one unvoiced fricative for another unvoiced fricative will cost less than substituting an unvoiced fricative for a voiced stop).
 
-We first convert our best-guess orthographic representation of the subject's non-lexical production to an estimated phonological representation using the Phonetisaurus grapheme-to-phoneme library \cite{Novak:2011aa}. 
+We first convert our best-guess orthographic representation of the subject's non-lexical production to an estimated phonological representation using the Phonetisaurus grapheme-to-phoneme library \cite{Novak:2012}.
 Next, we compute the phonologically-aware edit distance for each (production,candidate target) pair, and also apply the AphasiaBank phonological similarity rules. We use the CMU Pronouncing dictionary to obtain phonetic representations of the candidate target words.
 
 % subsection phonological_similarity (end)
@@ -345,10 +358,11 @@ Future work:
 
 \section*{Acknowledgments}
 
-Autism R01, Google, and Gerasimos's R03 (NIDCD 1R03DC014556-01A1)
+This material is based upon work supported in part by the National Institute on Deafness and Other Communication Disorders of the National Institutes of Health under awards R01DC012033 and R03DC014556.
+The content is solely the responsibility of the authors and does not necessarily represent the official views of the granting agencies or any other individual.
 
-
-\bibliography{target_word_prediction,other_refs}
+\bibliography{target_word_prediction,other_refs,kbg_refs}
+% TODO(steve): delete the other bib files and rename kbg_refs to something else.
 \bibliographystyle{naaclhlt2016}
 
 \end{document}
