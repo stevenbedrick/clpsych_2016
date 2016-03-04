@@ -174,20 +174,21 @@ Finally, we transformed the human-generated IPA representation of non-word produ
 Our purpose in doing this was to simulate a scenario where we did \emph{not} have high-quality human-produced phonetic transcriptions. Obviously, one major obstacle to using narrative samples in any sort of clinical assessment is the need for transcription.
 Two of the most plausible solutions to this problem are automatic speech recognition (ASR)\footnote{See Fraser et al. \shortcite{fraser-EtAl:2015:NAACL-HLT} for a detailed discussion of the implications of using ASR on the speech of individuals with aphasia} and/or the use of \emph{non-expert} transcribers to produce ``quick-and-dirty'' transcripts (perhaps via Amazon Mechanical Turk, or some other such crowd-sourced platform).
 
-In the case of ASR-derived transcripts, we would presumably have some sort of phonemic representation of what was said, though this representation would almost certainly be incomplete and error-prone (modern ASR systems are notorious for struggling with neologisms).
-In the case of non-expert transcribers, we would of course not have the professional-quality IPA transcriptions found in the AphasiaBank database.
+In the case of ASR-derived transcripts, we would presumably have access to some sort of phonetic representation of what was said by the subject, though this representation would almost certainly be incomplete and error-prone (ASR systems are particularly bad at handling non-word productions of any sort).
+Even in the less-challenging case of transcripts produced by non-expert humans, we would of course not find the professional-quality IPA transcriptions found in the AphasiaBank database.
 We would instead be working with a ``best effort'' attempt at rendering what the transcriber heard the subject produce.
 
-We therefore anticipate that our system will need to operate in a world with imperfect phonemic information.
-As such, we XXX % TODO: Joel, how did we do the IPA to grapheme conversion?
+We therefore anticipate that in any sort of ``real-world'' scenario of use, our system will need to operate with imperfect phonetic information.
+As such, for this study, we modified the phonetic transcripts found in the AphasiaBank data to something approximating ``standard'' English orthography.
 
-We chose two of the AphasiaBank personal narrative tasks--- describing the individual's stroke, and telling the story of an important event that happened sometime during the individual's life--- to work with, and excerpted the intervals containing those sections from each transcript.
+We next chose two of the AphasiaBank personal narrative tasks--- describing the individual's stroke, and telling the story of an important event that happened sometime during the individual's life--- to work with, and excerpted the intervals containing those sections from each transcript.
 This resulted in XXX sentences from YYY individuals. % TODO: Joel, numbers?
-We then identified sentences containing instances of our errors of interest: phonological paraphasia (codes XXX, YYY, etc.) or abstruse neologism % TODO: from Joel, find out exactly what codes we used
+We then identified sentences containing instances of our errors of interest: phonological paraphasia (AphasiaBank codes ``p:n'', ``p:m'', and ``n:k'') or abstruse neologism (``n:uk'').
 Note that the distribution of errors within sentences was relatively Zipfian, in that the majority of error-containing sentences contained a single error, followed somewhat distantly by sentences containing two errors, with a relatively steep dropoff thereafter.
 For the present study, we restricted our analysis to sentences that contained either one or two errors.
 
-Our reasoning for this restriction was that we do not presently have a theoretically-informed model of what, if any, relationship there may be between multiple errors within a sentence, but that it seems likely that the errors occurring in a sentence containing (for instance) five paraphasic errors might be somehow related to one another.
+Our reasoning for this restriction was that we do not presently have a theoretically-informed model of what, if any, relationship there may be between multiple errors within a sentence. 
+However, it seems quite likely that the errors occurring in a sentence containing (for instance) five paraphasic errors might be somehow related to one another.
 We anticipate exploring this phenomenon in the future (see section~\ref{sub:future_work}).
 
 Our final data set consisted of XXX sentences from YYY individuals, containing errors from ZZZ distinct categories. % TODO: Joel, numbers
@@ -218,7 +219,7 @@ To help accomplish this, we use a language model to identify plausible words tha
 Our language models for this study were built using the New York Times section of the Gigaword newswire corpus. % TODO: Kyle add good citation.
 We tokenized using the standard Penn Treebank tokenizer, left stopwords intact, and case-folded all sentences to upper-case.
 Cardinal numbers were collapsed into a category token, as were ordinal numbers and dates (each category was given its own token).
-We used the the OpenGrm-NGram language modeling toolkit \cite{RoarkOpenGRM} to build the language models themselves, using an n-gram order of 4, with XXX smoothing. % TODO: Joel, what kind of smoothing did we use?
+We used the the OpenGrm-NGram language modeling toolkit \cite{RoarkOpenGRM} to build the language models themselves, using an n-gram order of 4, with Kneser-Ney smoothing \cite{Kneser:1995ib}. 
 
 We investigated two different language model approaches.
 In the first approach, we trained our models on the totality of the New York Times data.
@@ -247,8 +248,8 @@ We next produced lattices representing the set of possible sentences that the su
 We did this by constructing a finite-state acceptor whose arcs represent words in the sentence.
 At the point in the produced sentence where our error detection system indicated that a non-word production occurred, we represent the anomaly by the union of all possible words in our lexicon (see figure~\ref{fig:sample_lattice} for an example sentence lattice). 
 
-We next weighted the sentence lattice by composing it with our language model.
-Then, we pruned our lattice by computing the $n$-best paths through the resulting weighted automaton with the Log semiring (for this analysis, $n$ was XXX). % TODO: Joel, what was n? 10?
+We next computed weights for the sentence lattice by composing it with our language model.
+Then, we pruned our lattice by computing the $n$-best paths through the resulting weighted automaton in the Tropical semiring (for this analysis, $n$ was 1,000). 
 Finally, we scored each possible remaining candidate production with the final forward probability of the version of the sentence containing that candidate.
 
 \begin{figure}[t]
@@ -272,15 +273,16 @@ In this work, we compute several different metrics of phonological similarity, a
 These methods fall into two general categories: rule-based and statistical.
 
 Many aphasia assessment instruments include strict rule-based guidelines on how to determine phonological similarity.
+For example, the scoring instructions for the Philadelphia Naming Test (PNT) include detailed rules that take into account the number of shared phonemes and syllables that two productions may have in common \cite{Roach:1996sp}.
 The annotation standards used by the AphasiaBank project also include an algorithm for determining if two words are phonologically related or not.
-As an example of one such rule, under the guidelines used by the AphasiaBank project, monosyllabic productions with an onset, vowel nucleus, and coda must match two of the three elements of a target word in order to be considered phonologically similar \cite{MacWhinney:2000aa}.
-These rules are designed to optimize for coding consistency and ease of use on the part of linguistically informed human annotators.
+As an example of one of the AphasiaBank rules, monosyllabic productions with an onset, vowel nucleus, and coda must match two of the three elements of a target word in order to be considered phonologically similar \cite{MacWhinney:2000aa}.
+Both the PNT and the AphasiaBank rule sets are designed to optimize for coding consistency and ease of use on the part of linguistically informed human annotators.
 
 As described in section~\ref{sub:related_work}, besides rule-based phonological similarity metrics, there exist variety of statistical approaches for determining phonological similarity. 
 In this work, we employ an edit-distance based metric that uses phoneme category rules, and assigns smaller substitution costs to replacement of ``similar'' phonemes (i.e., a substituting one unvoiced fricative for another unvoiced fricative will cost less than substituting an unvoiced fricative for a voiced stop).
 
-We first convert our best-guess orthographic representation of the subject's non-lexical production to an estimated phonological representation using the Phonetisaurus grapheme-to-phoneme library \cite{Novak:2011aa}. 
-Next, we compute the phonologically-aware edit distance for each (production,candidate target) pair, and also apply the AphasiaBank phonological similarity rules. We use the CMU Pronouncing dictionary to obtain phonetic representations of the candidate target words.
+We first convert our best-guess orthographic representation of the subject's non-lexical production to an estimated phonological representation using the Phonetisaurus grapheme-to-phoneme toolkit \cite{Novak:2011aa}. 
+Next, we compute the phonologically-aware edit distance for each (production,candidate target) pair, and also apply the Philadelphia Naming Test phonological similarity rules. We use the CMU Pronouncing dictionary to obtain phonetic representations of the candidate target words.
 
 At this point, we now have, for each error, a ranked list of plausible candidate target words, along with probability and phonological similarity scores for each candidate. We are now ready to attempt to classify the errors.
 
